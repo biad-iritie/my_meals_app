@@ -12,31 +12,44 @@ class MealDetailsScreen extends ConsumerWidget {
   });
 
   final Meal meal;
+
   // final void Function(Meal meal) onToggleFavorites;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favoriteMeals = ref.watch(favoriteMealsProvider);
+    bool isFavorite = favoriteMeals.contains(meal);
     return Scaffold(
       appBar: AppBar(
         title: Text(meal.title),
         actions: [
           IconButton(
-              onPressed: () async {
-                final result = ref
-                    .read(favoriteMealsProvider.notifier)
-                    .toggleMealFavoritesStatus(meal);
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        result ? "Meal added as a favorite" : "Meal removed."),
-                  ),
+            onPressed: () async {
+              final result = ref
+                  .read(favoriteMealsProvider.notifier)
+                  .toggleMealFavoritesStatus(meal);
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                      result ? "Meal added as a favorite" : "Meal removed."),
+                ),
+              );
+              // onToggleFavorites(meal);
+            },
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return RotationTransition(
+                  turns: Tween<double>(begin: 0.4, end: 1).animate(animation),
+                  child: child,
                 );
-                // onToggleFavorites(meal);
               },
-              icon: Icon(favoriteMeals.contains(meal)
-                  ? Icons.favorite
-                  : Icons.favorite_border))
+              child: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border,
+                key: ValueKey(isFavorite),
+              ),
+            ),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -44,11 +57,14 @@ class MealDetailsScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FadeInImage(
-              placeholder: MemoryImage(kTransparentImage),
-              image: NetworkImage(meal.imageUrl),
-              width: double.infinity,
-              fit: BoxFit.cover,
+            Hero(
+              tag: meal.id,
+              child: FadeInImage(
+                placeholder: MemoryImage(kTransparentImage),
+                image: NetworkImage(meal.imageUrl),
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(
               height: 14,
