@@ -15,6 +15,7 @@ class MealDetailsScreen extends ConsumerWidget {
   // final void Function(Meal meal) onToggleFavorites;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final favoriteMeals = ref.watch(favoriteMealsProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(meal.title),
@@ -33,7 +34,9 @@ class MealDetailsScreen extends ConsumerWidget {
                 );
                 // onToggleFavorites(meal);
               },
-              icon: const Icon(Icons.favorite))
+              icon: Icon(favoriteMeals.contains(meal)
+                  ? Icons.favorite
+                  : Icons.favorite_border))
         ],
       ),
       body: SingleChildScrollView(
